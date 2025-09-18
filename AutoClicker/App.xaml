@@ -1,10 +1,47 @@
-﻿<Application x:Class="AutoClicker.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="Views/MainWindow.xaml"
-             ShutdownMode="OnMainWindowClose">
-    <Application.Resources>
-        <BitmapImage x:Key="AboutIcon" UriSource="Resources/Icons/about.ico" />
-        <BitmapImage x:Key="SettingsIcon" UriSource="Resources/Icons/settings.ico" />
-    </Application.Resources>
-</Application>
+// Admin account
+const admin = { username: "admin", password: "1234" };
+
+// Characters to try
+const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+// Smart brute-force for unknown password length with live progress
+async function smartBruteForceUnknownLength() {
+  let attempts = 0;
+  let length = 1;
+  let found = false;
+
+  while (!found) {
+    let guess = "";
+
+    for (let i = 0; i < length; i++) {
+      let charFound = false;
+
+      while (!charFound) {
+        const charGuess = chars[Math.floor(Math.random() * chars.length)];
+        attempts++;
+
+        if (i < admin.password.length && charGuess === admin.password[i]) {
+          guess += charGuess;
+          charFound = true;
+
+          console.clear();
+          console.log(`Password guessing progress: ${guess.padEnd(length, "_")}`);
+          console.log(`Attempts so far: ${attempts}`);
+
+          // Small delay to make it visible
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      }
+    }
+
+    if (guess === admin.password) {
+      found = true;
+      console.log(`\nPassword guessed successfully: '${guess}' in ${attempts} attempts!`);
+    } else {
+      length++; // Increase length if not found
+    }
+  }
+}
+
+// Run the live brute-force for unknown length
+smartBruteForceUnknownLength();
